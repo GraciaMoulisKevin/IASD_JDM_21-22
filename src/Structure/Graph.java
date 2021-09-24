@@ -15,6 +15,8 @@ public class Graph {
     /**
      * Formation des nodes de base + Start / End
      * @param words
+     *
+     * --- question : comment set le type d'Edge qu'on utilise afin de mettre Suivant ici
      */
     private void loadSentence(String[] words){
         Start start = new Start();

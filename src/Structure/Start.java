@@ -1,5 +1,5 @@
 package Structure;
 
 public class Start extends AbstractNode{
-    public Start(){ data = "START"; }
+    public Start(){ type = data = "START"; }
 }
