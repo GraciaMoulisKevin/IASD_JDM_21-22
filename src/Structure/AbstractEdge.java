@@ -1,6 +1,4 @@
 package Structure;
 
-public abstract class AbstractEdge implements InterfaceNode {
-    String data;
-    public String toString(){ return data; }
+public abstract class AbstractEdge extends AbstractGraphElement {
 }
