@@ -1,4 +1,5 @@
 package Structure;
 
-public abstract class AbstractNode extends AbstractGraphElement {
+public abstract class AbstractNode  {
+    String data;
 }

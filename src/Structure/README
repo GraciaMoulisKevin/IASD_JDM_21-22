@@ -2,12 +2,6 @@
 # Yop j'exprime mes doutes ici afin d'y penser plus tard, wow mais c'est insane #
 ---------------------------------------------------------------------------------
 
-* Retirer l'attribut type est utilisé isTypeOf plutot ?
-
-* Je ne vois pas trop quoi mettre d'utile dans les arcs pour le moment
-
-* AbstactGraphElement est là juste car j'étais trigger de voir une redondance de 3 lignes xd
-
-* Comment définir quel type d'arc est utilisé par la méthode addEdge()
+*
 
 -----------------------------------------------------------------------------------

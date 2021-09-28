@@ -1,4 +1,9 @@
 package Structure;
 
-public abstract class AbstractEdge extends AbstractGraphElement {
+import org.jgrapht.graph.DefaultEdge;
+
+public abstract class AbstractEdge extends DefaultEdge {
+    String data;
+
+    public String toString(){ return data; }
 }

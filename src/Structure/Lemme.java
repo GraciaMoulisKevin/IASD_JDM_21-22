@@ -1,10 +1,7 @@
 package Structure;
 
 public class Lemme extends AbstractNode{
-    String provenance;
-
-    public Lemme(String _data){ data = getLemme(_data); type = "LEMME"; provenance = _data;}
-    public String getProvenance(){ return provenance; }
+    public Lemme(String _data){ data = getLemme(_data);}
 
     /**
      * --- A FAIRE ---
