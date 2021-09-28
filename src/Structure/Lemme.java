@@ -1,7 +1,7 @@
 package Structure;
 
 public class Lemme extends AbstractNode{
-    public Lemme(String _data){ data = getLemme(_data);}
+    public Lemme(String _data){ data = getLemme(_data); type = "LEMME"; }
 
     /**
      * --- A FAIRE ---
@@ -9,6 +9,7 @@ public class Lemme extends AbstractNode{
      * @return lemme de _word
      */
     private String getLemme(String _word){
+        // call vers JDM pour trouver le Lemme
         return _word;
     }
 }
