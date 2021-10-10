@@ -4,18 +4,11 @@
 
 ======== NE SEMBLE PAS FONCTIONNER ========
 
-* getAllPaths  ==>  Aucune idée pourquoi
 
-* setLemme  ==> Je dois la refaire car getAllNode mélange les noeuds donc pas possible d'utiliser ça pour parcourir proprement
-    l'ensemble, je partirai donc de START en avancant au fur et à mesure via getEdgeTarget
 
 ======== A TEST ========
 
-* getAllPaths
-
 * setMultiMots
-
-* setLemme
 
 ================================
 

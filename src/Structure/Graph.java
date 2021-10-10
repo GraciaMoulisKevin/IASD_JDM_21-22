@@ -52,8 +52,6 @@ public class Graph {
 
     /**
      * Set Lemme of each Word
-     *
-     * probleme ligne 73 avec le passage de active_node en parametre
      */
     protected void loadLemmes(){
         AbstractNode active_node = getStart();
@@ -68,6 +66,11 @@ public class Graph {
         while (active_node != getEnd()) {
             Lemme active_lemme = new Lemme(active_node.getData());
             g.addVertex(active_lemme);
+
+            AbstractNode tmp_node = null;
+            for (AbstractEdge edge : g.outgoingEdgesOf(active_node)){
+                tmp_node = g.getEdgeTarget(edge);
+            }
 
             Edge edgeLemme = new Edge(active_node+","+active_lemme,"LEMME");
             g.addEdge(active_node,active_lemme,edgeLemme);
@@ -84,11 +87,11 @@ public class Graph {
 
             last_lemme = active_lemme;
             last_node = active_node;
-            for (AbstractEdge edge : g.outgoingEdgesOf(active_node)){
-                active_node = g.getEdgeTarget(edge);
-            }
-            System.out.println(active_node.getData());
+
+            active_node = tmp_node;
         }
+        FollowedBy edgeFollowed_LastLemme_ActNode = new FollowedBy(last_lemme+","+active_node);
+        g.addEdge(last_lemme,active_node,edgeFollowed_LastLemme_ActNode);
         /*
         int cpt = 0;
         String disp = "START";
@@ -135,7 +138,18 @@ public class Graph {
      **********************************/
 
     protected void setMultiMots(AbstractNode n1,AbstractNode n2,String multiMots){
+        AbstractNode pre_node = null;
+        AbstractNode post_node = null;
 
+        for (AbstractEdge edge : g.outgoingEdgesOf(active_node)){
+            active_node = g.getEdgeTarget(edge);
+        }
+        /**
+         * Je met en pause car j'ai des doutes sur
+         *
+         * si le noeud pop il prend que le prochain
+         * ou TOUT les prochains
+         */
     }
 
     /*****************************
@@ -196,7 +210,7 @@ public class Graph {
         AllDirectedPaths<AbstractNode, AbstractEdge> graph = new AllDirectedPaths<AbstractNode, AbstractEdge>(g);
 
         List<GraphPath<AbstractNode, AbstractEdge>> allPaths =
-                graph.getAllPaths(getEnd(), getStart(), true, null);
+                graph.getAllPaths(getStart(), getEnd(), true, null);
 
         return allPaths;
     }
