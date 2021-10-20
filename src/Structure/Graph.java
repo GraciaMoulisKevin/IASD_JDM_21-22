@@ -145,6 +145,7 @@ public class Graph {
         int cptProfondeur = 1;
 
         // Exécutions tant que la liste de départ n'est à l'arrivé
+        List<AbstractNode> aRemove = new ArrayList<>();
         while (!activeNodeList.contains(getEnd())) {
             // Loop sur chaque element de la liste de départ
             if (cptProfondeur == 1) {
@@ -153,11 +154,12 @@ public class Graph {
                     if (activeNode != getStart()) {
                         List<AbstractNode> tmp = new ArrayList<>(); tmp.add(activeNode);
                         if (!root.checkBeginning(tmp)) {
-                            activeNodeList.remove(activeNode);
+                            aRemove.add(activeNode);
                         }
                     }
                 }
             }
+            for (AbstractNode node : aRemove) activeNodeList.remove(node);
             // Check si pas de début potentiel de mot composés
             // si oui gen nouveau début potentiel dans activeNodeList
             if (activeNodeList.isEmpty()){
@@ -182,6 +184,7 @@ public class Graph {
                     }
                 }
                 // Check allPath between activeNodeList & potentialEndNode
+                aRemove = new ArrayList<>();
                 for (AbstractNode startNode : activeNodeList){
                     int cptPotentialStart = 0;
                     for (AbstractNode endNode : potentialEndNode){
@@ -193,19 +196,22 @@ public class Graph {
                                 for (AbstractNode node : nodeList){
                                     motComp += node+" ";
                                 }
+                                System.out.println(">>> MOT COMPOSE SPOTTED : "+motComp);
                                 setMultiMots(startNode,endNode,motComp);
                             }
                             // si sous mot composé
                             if (root.checkBeginning(nodeList)){
+                                System.out.println(">>> DEBUT DE MOT COMPOSE SPOTTED : "+nodeList);
                                 cptPotentialStart++;
                             }
                         }
                     }
                     // SI =0 alors aucun chemin utilise cette node comme point de départ
                     if(cptPotentialStart == 0){
-                        activeNodeList.remove(startNode);
+                        aRemove.add(startNode);
                     }
                 }
+                for (AbstractNode node : aRemove) activeNodeList.remove(node);
                 cptProfondeur++;
             }
         }
