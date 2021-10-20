@@ -48,10 +48,6 @@ public class TreeNode {
         }
     }
 
-    private Collection<TreeNode> getChildren() {
-        return children.values();
-    }
-
     public String getWord() {
         return word;
     }
@@ -101,7 +97,7 @@ public class TreeNode {
     }
 
 
-        public static TreeNode makePath(List<String> liste) {
+    public static TreeNode makePath(List<String> liste) {
         liste = new ArrayList<>(liste);
         TreeNode firstNode = new TreeNode(liste.remove(0));
         TreeNode latestNode = firstNode;
@@ -114,6 +110,69 @@ public class TreeNode {
         latestNode.setEndWord(true);
         return firstNode;
 
+    }
+
+    public boolean checkPath(TreeNode path) {
+        return checkHelper(path, false);
+    }
+
+    public boolean checkPath(List<AbstractNode> nodePath){
+        return checkPath(makePathFromNodes(nodePath));
+    }
+
+    public boolean checkBeginning(TreeNode path) {
+        return checkHelper(path, true);
+    }
+
+    public boolean checkBeginning(List<AbstractNode> nodePath) {
+        return checkBeginning(makePathFromNodes(nodePath));
+    }
+
+    private boolean checkHelper(TreeNode path, boolean strictPrefix) {
+        if (path.getChildrenNumber() > 1) {
+            throw new IllegalArgumentException("Supplied tree is not a path (multiple children somewhere) : " + path);
+        }
+        if (!path.getWord().equals(getWord())) return false;
+        if (!path.hasChildren()) {
+
+            return (isAnEndWord && !strictPrefix) || (strictPrefix);
+        }
+        TreeNode nextInLine = path.getSingleChild();
+        if (children.containsKey(nextInLine.getWord())){
+            TreeNode child = children.get(nextInLine.getWord());
+            return child.checkPath(nextInLine);
+        }
+        return false;
+
+    }
+
+    private static TreeNode makePathFromNodes(List<AbstractNode> nodes) {
+        List<String> pathList = nodes.stream()
+                .map(AbstractNode::getData).collect(Collectors.toList());
+        TreeNode path = getNew();
+        path.addChild(makePath(pathList));
+        return path;
+    }
+
+    private int getChildrenNumber() {
+        return children.size();
+    }
+
+    private TreeNode getSingleChild() {
+        if (children.size() > 1) {
+            throw new IllegalArgumentException("Node has more than one child");
+        }
+        TreeNode result = null;
+        for (TreeNode child: children.values()) result = child;
+        return result;
+    }
+
+    private boolean hasChildren() {
+        return !children.isEmpty();
+    }
+
+    private Collection<TreeNode> getChildren() {
+        return children.values();
     }
 
     public String toString() {
@@ -152,52 +211,6 @@ public class TreeNode {
 
         a.addChild(d2);
         System.out.println(a);
-    }
-
-    public boolean checkPath(TreeNode path) {
-        if (path.getChildrenNumber() > 1) {
-            throw new IllegalArgumentException("Supplied tree is not a path (multiple children somewhere) : " + path);
-        }
-        if (!path.getWord().equals(getWord())) return false;
-        if (!path.hasChildren()) {
-
-         	return isAnEndWord;   
-        }
-        TreeNode nextInLine = path.getSingleChild();
-        if (children.containsKey(nextInLine.getWord())){
-            TreeNode child = children.get(nextInLine.getWord());
-            return child.checkPath(nextInLine);
-        }
-        return false;
-    }
-
-    public boolean checkPath(List<AbstractNode> nodePath){
-        List<String> path = nodePath.stream()
-        								.map(AbstractNode::getData).collect(Collectors.toList());
-        TreeNode pathToCheck = getNew();
-        pathToCheck.addChild(makePath(path));
-
-        System.out.println("Testing " + pathToCheck );
-      return checkPath(pathToCheck);
-    }
-    
-    
-
-    private int getChildrenNumber() {
-        return children.size();
-    }
-
-    private TreeNode getSingleChild() {
-        if (children.size() > 1) {
-            throw new IllegalArgumentException("Node has more than one child");
-        }
-        TreeNode result = null;
-        for (TreeNode child: children.values()) result = child;
-        return result;
-    }
-
-    private boolean hasChildren() {
-        return !children.isEmpty();
     }
 
 

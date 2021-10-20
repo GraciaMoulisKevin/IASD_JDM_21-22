@@ -137,47 +137,76 @@ public class Graph {
         TreeNode root = TreeNode.getNew();
         MultiMotsTreeFactory.fillPaths(root, paths);
 
-        ParserMultimots.write(paths,"files/output.txt");
-        //System.out.println(root);
-
-        List<List<AbstractNode>> nodeSequences = genAllGetArrayNodes();
-        System.out.println("Testing multiwords");
-        for (List<AbstractNode> nodeSequence : nodeSequences){
-           // nodeSequence.remove(0); nodeSequence.remove(nodeSequence.size()-1);
-			System.out.println(nodeSequence + " = " + root.checkPath(nodeSequence));
-
-        }
-
-    }
-    protected boolean verif_quentin(List<AbstractNode> nodeList){ return true; }
-
-    /**
-     * Set MultiWords
-     */
-    protected void tmp_loadMultiWords(){
-        Collection<List<String>> paths = ParserMultimots.parseFile("files//09172021-LEXICALNET-JEUXDEMOTS-ENTRIES-MWE.txt");
-        TreeNode root = TreeNode.getNew();
-        MultiMotsTreeFactory.fillPaths(root, paths);
-
-        AbstractNode active_node = getStart();
+        // Gen de la liste gérant les points de départ
+        List<AbstractNode> activeNodeList = new ArrayList<>();
+        activeNodeList.add(getStart());
+        AbstractNode lastStartNode = getStart();
         AsSubgraph<AbstractNode, AbstractEdge> graphFollowedBy = getGraphFollowedBy();
+        int cptProfondeur = 1;
 
-        // spam getAllPaths sur les sous graph
-        while (active_node != getEnd()) {
-            for (AbstractEdge activeEdge : graphFollowedBy.outgoingEdgesOf(active_node)){
-                AbstractNode start_path = graphFollowedBy.getEdgeTarget(activeEdge);
-                List<AbstractNode> nodeSequence = new ArrayList<>();
-                nodeSequence.add(start_path);
-
-                if (verif_quentin(nodeSequence)){
-                    // break et passe à l'active node suivante
+        // Exécutions tant que la liste de départ n'est à l'arrivé
+        while (!activeNodeList.contains(getEnd())) {
+            // Loop sur chaque element de la liste de départ
+            if (cptProfondeur == 1) {
+                lastStartNode = activeNodeList.get(0); // Si crash car pas d'élement erreur dans le code car getEnd()
+                for (AbstractNode activeNode : activeNodeList) {
+                    if (activeNode != getStart()) {
+                        List<AbstractNode> tmp = new ArrayList<>(); tmp.add(activeNode);
+                        if (!root.checkBeginning(tmp)) {
+                            activeNodeList.remove(activeNode);
+                        }
+                    }
                 }
-
-                // avance 1 ------> n pas par pas
-                // en vérifiant si le sous multi existe à chaque fois
-                // de plus s'il existe totalement l'ajoute
-
-                System.out.println(nodeSequence + " = " + root.checkPath(nodeSequence));
+            }
+            // Check si pas de début potentiel de mot composés
+            // si oui gen nouveau début potentiel dans activeNodeList
+            if (activeNodeList.isEmpty()){
+                cptProfondeur = 1;
+                for (AbstractEdge activeEdge : graphFollowedBy.outgoingEdgesOf(lastStartNode)){
+                    activeNodeList.add(g.getEdgeTarget(activeEdge));
+                }
+            }else{
+                // Cas ou il y a des éléments de départ potentiel
+                List<AbstractNode> potentialEndNode = new ArrayList<>();
+                AbstractNode ptrNode = lastStartNode;
+                // Charge potentialEndEdge selon la profondeur
+                for (int i=0; i<cptProfondeur; i++){
+                    for (AbstractEdge activeEdge : graphFollowedBy.outgoingEdgesOf(ptrNode)){
+                        ptrNode = g.getEdgeTarget(activeEdge);
+                        if (i == cptProfondeur - 1){
+                            potentialEndNode.add(ptrNode);
+                        }
+                    }
+                    for (AbstractEdge activeEdge : graphFollowedBy.outgoingEdgesOf(ptrNode)){
+                        ptrNode = g.getEdgeTarget(activeEdge);
+                    }
+                }
+                // Check allPath between activeNodeList & potentialEndNode
+                for (AbstractNode startNode : activeNodeList){
+                    int cptPotentialStart = 0;
+                    for (AbstractNode endNode : potentialEndNode){
+                        // Check si Path est sous mot composé ou un mot composé
+                        for ( List<AbstractNode> nodeList : getAllPathsBetween(graphFollowedBy,startNode,endNode)){
+                            // si mot composé
+                            if (root.checkPath(nodeList)){
+                                String motComp = " ";
+                                for (AbstractNode node : nodeList){
+                                    motComp += node+" ";
+                                }
+                                setMultiMots(startNode,endNode,motComp);
+                            }
+                            // si sous mot composé
+                            if (root.checkBeginning(nodeList)){
+                                cptPotentialStart++;
+                            }
+                        }
+                    }
+                    // SI =0 alors aucun chemin utilise cette node comme point de départ
+                    if(cptPotentialStart == 0){
+                        activeNodeList.remove(startNode);
+                    }
+                }
+                cptProfondeur++;
             }
         }
     }
@@ -269,6 +298,7 @@ public class Graph {
 
         return allPaths;
     }
+
     public List<GraphPath<AbstractNode, AbstractEdge>> getAllPaths(AsSubgraph<AbstractNode, AbstractEdge> subGraph){
         AllDirectedPaths<AbstractNode, AbstractEdge> graph = new AllDirectedPaths<AbstractNode, AbstractEdge>(subGraph);
 
@@ -278,15 +308,16 @@ public class Graph {
         return allPaths;
     }
 
-    ///////// FAUT SUREMENT SUICIDE CES DEUX METHODES
-    /**
-     * Call getArrayNodes on each path
-     */
-    protected List<List<AbstractNode>> genAllGetArrayNodes(){
+    public List<List<AbstractNode>> getAllPathsBetween(AsSubgraph<AbstractNode, AbstractEdge> subGraph, AbstractNode _start, AbstractNode _end){
+        AllDirectedPaths<AbstractNode, AbstractEdge> graph = new AllDirectedPaths<AbstractNode, AbstractEdge>(subGraph);
+        List<GraphPath<AbstractNode, AbstractEdge>> allPaths =
+                graph.getAllPaths(_start, _end, true, null);
+
         List<List<AbstractNode>> list = new ArrayList<List<AbstractNode>>();
-        for (GraphPath<AbstractNode, AbstractEdge> graph : getAllPaths()){
-            list.add(getArrayNodes(graph));
+        for (GraphPath<AbstractNode, AbstractEdge> graphPath : allPaths){
+            list.add(getArrayNodes(graphPath));
         }
+
         return list;
     }
 
@@ -298,16 +329,7 @@ public class Graph {
         graphList.remove(getStart());
         graphList.remove(getEnd());
 
-        for (AbstractNode node : graphList) {
-
-        }
-
         return graphList;
-        /**
-         * mettre les compositions de phrase de 0 à n
-         * puis 1 à n
-         * etc etc etc
-         */
     }
 
     /**********
