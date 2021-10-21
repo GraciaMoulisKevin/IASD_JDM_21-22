@@ -10,6 +10,6 @@ public class Lemme extends AbstractNode{
      */
     private String getLemme(String _word){
         // call vers JDM pour trouver le Lemme
-        return _word;
+        return "lemmeDe_"+_word;
     }
 }

@@ -37,7 +37,9 @@ public class ParserMultimots {
 
                 //on enlève seulement l'id et le point virgule final
                 String multimot = strLine.split(";", 2)[1];
-                multimot = multimot.substring(1, multimot.length()-2);
+                multimot = multimot.substring(0, multimot.length()-1);
+                multimot = multimot.startsWith("\"") ? multimot.substring(1) : multimot;
+                multimot = multimot.endsWith("\"") ? multimot.substring(0, multimot.length() -1) : multimot;
 
                 //on veut split sur l'apostrophe MAIS la garder. Donc en amont on rajoute un espace
                 multimot = multimot.replaceAll("'", "' ");
@@ -97,8 +99,24 @@ public class ParserMultimots {
 
     public static void main(String[] args) {
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
-        Collection<List<String>> result = parseFile("files/ENTRIES-MULTI-simple.txt");
+        Collection<List<String>> result = parseFile("files/09172021-LEXICALNET-JEUXDEMOTS-ENTRIES-MWE.txt");
         write(result, "files/output.txt");
+        TreeNode root = TreeNode.getNew();
+        for (List<String> path: result) {
+            TreeNode test = TreeNode.makePath(path);
+            root.addChild(test);
+            }
+        TreeNode avant = TreeNode.getNew();
+        avant.addChild(new TreeNode("avant"));
+        List<String> aa= new ArrayList<String>(Arrays.asList("avant", "toute"));
+        TreeNode avantFull = TreeNode.makePath(aa);
+        System.out.println(avant);
+        System.out.println(root.checkBeginning(avant));
+        
+        System.out.println(avantFull);
+        System.out.println("checkPath = " + root.checkPath(avantFull));
+        System.out.println("checkBeginning = " + root.checkBeginning(avantFull));
+        
     }
 
 }

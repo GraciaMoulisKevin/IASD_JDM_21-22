@@ -23,9 +23,6 @@ public class test2 {
 
         System.out.println("Nb de chemin possible : " + g.getAllPaths().size());
 
-        // test mise en forme pour multi mot
 
-        // TEST
-        // multiMots
     }
 }

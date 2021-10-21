@@ -1,13 +1,13 @@
 package Structure;
 
+import multimots.MultiMotsTreeFactory;
+import multimots.ParserMultimots;
+import multimots.TreeNode;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.AllDirectedPaths;
 import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 
-import multimots.ParserMultimots;
-import multimots.TreeNode;
-import multimots.MultiMotsTreeFactory;
 import java.util.*;
 
 public class Graph {
@@ -149,14 +149,14 @@ public class Graph {
         while (!activeNodeList.contains(getEnd())) {
             // Loop sur chaque element de la liste de départ
             if (cptProfondeur == 1) {
-                lastStartNode = activeNodeList.get(0); // Si crash car pas d'élement erreur dans le code car getEnd()
+                lastStartNode = activeNodeList.get(0); // Si crash => erreur dans le code car getEnd()
                 for (AbstractNode activeNode : activeNodeList) {
-                    if (activeNode != getStart()) {
+                    //if (activeNode != getStart()) {
                         List<AbstractNode> tmp = new ArrayList<>(); tmp.add(activeNode);
                         if (!root.checkBeginning(tmp)) {
                             aRemove.add(activeNode);
                         }
-                    }
+                    //}
                 }
             }
             for (AbstractNode node : aRemove) activeNodeList.remove(node);
@@ -192,16 +192,14 @@ public class Graph {
                         for ( List<AbstractNode> nodeList : getAllPathsBetween(graphFollowedBy,startNode,endNode)){
                             // si mot composé
                             if (root.checkPath(nodeList)){
-                                String motComp = " ";
+                                String motComp = "";
                                 for (AbstractNode node : nodeList){
-                                    motComp += node+" ";
+                                    motComp += " "+node;
                                 }
-                                System.out.println(">>> MOT COMPOSE SPOTTED : "+motComp);
                                 setMultiMots(startNode,endNode,motComp);
                             }
                             // si sous mot composé
                             if (root.checkBeginning(nodeList)){
-                                System.out.println(">>> DEBUT DE MOT COMPOSE SPOTTED : "+nodeList);
                                 cptPotentialStart++;
                             }
                         }

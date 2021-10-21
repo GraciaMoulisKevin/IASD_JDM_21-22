@@ -36,6 +36,9 @@ public class TreeNode {
 
 
     public void addChild(TreeNode newChild) {
+    	if (newChild.size() >1 && newChild.getWord().equals(START)){
+    		newChild = newChild.getSingleChild();
+    	}
         if (!children.containsKey(newChild.getWord())) {
             children.put(newChild.getWord(), newChild);
         }
@@ -97,7 +100,7 @@ public class TreeNode {
     }
 
 
-    public static TreeNode makePath(List<String> liste) {
+        public static TreeNode makePath(List<String> liste) {
         liste = new ArrayList<>(liste);
         TreeNode firstNode = new TreeNode(liste.remove(0));
         TreeNode latestNode = firstNode;
@@ -108,47 +111,58 @@ public class TreeNode {
 
         }
         latestNode.setEndWord(true);
-        return firstNode;
+        TreeNode root = getNew();
+        root.addChild(firstNode);
+        return root;
 
     }
 
     public boolean checkPath(TreeNode path) {
-        return checkHelper(path, false);
+    	return checkHelper(path, false);
     }
-
+    
     public boolean checkPath(List<AbstractNode> nodePath){
-        return checkPath(makePathFromNodes(nodePath));
-    }
+	  return checkPath(makePathFromNodes(nodePath));
+	}
 
-    public boolean checkBeginning(TreeNode path) {
-        return checkHelper(path, true);
-    }
+	public boolean checkBeginning(TreeNode path) {
+		return checkHelper(path, true);
+	}
 
-    public boolean checkBeginning(List<AbstractNode> nodePath) {
-        return checkBeginning(makePathFromNodes(nodePath));
-    }
+	public boolean checkBeginning(List<AbstractNode> nodePath) {
+		return checkBeginning(makePathFromNodes(nodePath));    	
+	}
 
-    private boolean checkHelper(TreeNode path, boolean strictPrefix) {
-        if (path.getChildrenNumber() > 1) {
-            throw new IllegalArgumentException("Supplied tree is not a path (multiple children somewhere) : " + path);
-        }
-        if (!path.getWord().equals(getWord())) return false;
-        if (!path.hasChildren()) {
+	private boolean checkHelper(TreeNode path, boolean strictPrefix) {
+		//System.out.println("checking " + path);
+	    if (path.getChildrenNumber() > 1) {
+	        throw new IllegalArgumentException("Supplied tree is not a path (multiple children somewhere) : " + path);
+	    }
+	    if (!path.getWord().equals(getWord())) {
+	    	//System.out.println(path.getWord() + " isn't equal to" + getWord());
+	    	return false;
+	    }
+	    if (!path.hasChildren()) {
+	    	//System.out.println(path.getWord() + " has no child");
+	    	//System.out.println("Strict prefix is " + strictPrefix);
+	
+	     	return isAnEndWord || strictPrefix;
+	    }
+	    TreeNode nextInLine = path.getSingleChild();
+	    //System.out.println("Next in line is " + nextInLine.getWord());
+	    //System.out.println(children.keySet());
+	    if (children.containsKey(nextInLine.getWord())){
+	    	//System.out.println(nextInLine.getWord() + " is in " + children.keySet());
+	        TreeNode child = children.get(nextInLine.getWord());
+	        return child.checkHelper(nextInLine, strictPrefix);
+	    }
+	    return false;
+		
+	}
 
-            return (isAnEndWord && !strictPrefix) || (strictPrefix);
-        }
-        TreeNode nextInLine = path.getSingleChild();
-        if (children.containsKey(nextInLine.getWord())){
-            TreeNode child = children.get(nextInLine.getWord());
-            return child.checkPath(nextInLine);
-        }
-        return false;
-
-    }
-
-    private static TreeNode makePathFromNodes(List<AbstractNode> nodes) {
+	private static TreeNode makePathFromNodes(List<AbstractNode> nodes) {
         List<String> pathList = nodes.stream()
-                .map(AbstractNode::getData).collect(Collectors.toList());
+				.map(AbstractNode::getData).collect(Collectors.toList());
         TreeNode path = getNew();
         path.addChild(makePath(pathList));
         return path;
@@ -158,7 +172,7 @@ public class TreeNode {
         return children.size();
     }
 
-    private TreeNode getSingleChild() {
+    public TreeNode getSingleChild() {
         if (children.size() > 1) {
             throw new IllegalArgumentException("Node has more than one child");
         }
@@ -171,47 +185,47 @@ public class TreeNode {
         return !children.isEmpty();
     }
 
-    private Collection<TreeNode> getChildren() {
-        return children.values();
-    }
+	private Collection<TreeNode> getChildren() {
+	    return children.values();
+	}
 
-    public String toString() {
-        String ret = "[" + word;
-        if (isAnEndWord) ret += " * ";
-        for (TreeNode child: children.values()) {
-            ret += "\n" + child.toString();
-        }
-        ret += "]";
-        return ret;
-    }
+	public String toString() {
+	    String ret = "[" + word;
+	    if (isAnEndWord) ret += " * ";
+	    for (TreeNode child: children.values()) {
+	        ret += "\n" + child.toString();
+	    }
+	    ret += "]";
+	    return ret;
+	}
 
-    public static void main(String[] args) {
-        TreeNode a = new TreeNode("a");
-        TreeNode b = new TreeNode("b");
-        TreeNode c = new TreeNode("c");
-        TreeNode d = new TreeNode("d");
-        TreeNode e = new TreeNode("e");
-
-        d.addChild(e);
-        a.addChild(b);
-        a.addChild(c);
-        a.addChild(d);
-
-        System.out.println(a);
-
-
-        TreeNode d2 = new TreeNode("d");
-        TreeNode e2 = new TreeNode("e");
-        TreeNode f2 = new TreeNode("f");
-
-
-        d2.addChild(e2);
-        e2.addChild(f2);
-        System.out.println(d2);
-
-        a.addChild(d2);
-        System.out.println(a);
-    }
+	public static void main(String[] args) {
+	    TreeNode a = new TreeNode("a");
+	    TreeNode b = new TreeNode("b");
+	    TreeNode c = new TreeNode("c");
+	    TreeNode d = new TreeNode("d");
+	    TreeNode e = new TreeNode("e");
+	
+	    d.addChild(e);
+	    a.addChild(b);
+	    a.addChild(c);
+	    a.addChild(d);
+	
+	    System.out.println(a);
+	
+	
+	    TreeNode d2 = new TreeNode("d");
+	    TreeNode e2 = new TreeNode("e");
+	    TreeNode f2 = new TreeNode("f");
+	
+	
+	    d2.addChild(e2);
+	    e2.addChild(f2);
+	    System.out.println(d2);
+	
+	    a.addChild(d2);
+	    System.out.println(a);
+	}
 
 
 }

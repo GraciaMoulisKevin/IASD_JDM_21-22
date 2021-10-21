@@ -11,7 +11,7 @@ public class MultiMotsTreeFactory {
 
     public static void fillPaths(TreeNode root, Collection<List<String>> paths){
         for (List<String> path : paths){
-            root.addChild(TreeNode.makePath(path));
+            root.addChild(TreeNode.makePath(path).getSingleChild());
         }
 
     }
