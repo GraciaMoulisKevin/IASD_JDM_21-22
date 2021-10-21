@@ -179,12 +179,10 @@ public class Graph {
                             potentialEndNode.add(ptrNode);
                         }
                     }
-                    for (AbstractEdge activeEdge : graphFollowedBy.outgoingEdgesOf(ptrNode)){
-                        ptrNode = g.getEdgeTarget(activeEdge);
-                    }
                 }
                 // Check allPath between activeNodeList & potentialEndNode
                 aRemove = new ArrayList<>();
+                //System.out.println("++ "+activeNodeList+" : "+cptProfondeur+ " : "+potentialEndNode);
                 for (AbstractNode startNode : activeNodeList){
                     int cptPotentialStart = 0;
                     for (AbstractNode endNode : potentialEndNode){
@@ -196,7 +194,9 @@ public class Graph {
                                 for (AbstractNode node : nodeList){
                                     motComp += " "+node;
                                 }
-                                setMultiMots(startNode,endNode,motComp);
+                                if (!potentialEndNode.contains(getEnd())){
+                                    setMultiMots(startNode,endNode,motComp);
+                                }
                             }
                             // si sous mot composé
                             if (root.checkBeginning(nodeList)){
