@@ -6,7 +6,8 @@ import org.jgrapht.GraphPath;
 
 public class test2 {
     public static void main(String args[]){
-        String text = "Bon avant toute chose il faut savoir avoir le pouce rond.";
+        //String text = "Bon avant toute chose il faut savoir avoir le pouce rond.";
+        String text = "un gros chien noir";
         String words[] = text.split("\\W+");
         Graph g = new Graph(words);
 

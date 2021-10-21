@@ -230,12 +230,12 @@ public class Graph {
         g.addVertex(nodeMultiWords);
 
         for (AbstractEdge edge : getGraphFollowedBy().incomingEdgesOf(n1)){
-            FollowedBy edgeFollowed_Pre_Multi = new FollowedBy(edge+","+multiMots);
+            FollowedBy edgeFollowed_Pre_Multi = new FollowedBy(g.getEdgeSource(edge)+","+multiMots);
             g.addEdge(g.getEdgeSource(edge),nodeMultiWords,edgeFollowed_Pre_Multi);
         }
 
         for (AbstractEdge edge : getGraphFollowedBy().outgoingEdgesOf(n2)){
-            FollowedBy edgeFollowed_Post_Multi = new FollowedBy(multiMots+","+edge);
+            FollowedBy edgeFollowed_Post_Multi = new FollowedBy(multiMots+","+g.getEdgeTarget(edge));
             g.addEdge(nodeMultiWords,g.getEdgeTarget(edge),edgeFollowed_Post_Multi);
         }
     }
