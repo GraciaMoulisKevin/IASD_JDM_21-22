@@ -36,6 +36,7 @@ public class Graph {
 
         Word preNode = new Word("");
 
+        // Chargement de chaque mot en tant que Node avec arc FollowedBy entre eux
         for (String word : words){
             Word node = new Word(word);
             g.addVertex(node);
@@ -62,25 +63,32 @@ public class Graph {
 
         Lemme last_lemme = null;
 
+        // Setup de la premiere node suivant Start
         for (AbstractEdge edge : g.outgoingEdgesOf(active_node)){
             active_node = g.getEdgeTarget(edge);
         }
 
+        // Boucle jusqu'à l'arrivé à la node End
         while (active_node != getEnd()) {
             Lemme active_lemme = new Lemme(active_node.getData());
             g.addVertex(active_lemme);
 
             AbstractNode tmp_node = null;
+            // Prépare la prochaine node active
             for (AbstractEdge edge : g.outgoingEdgesOf(active_node)){
                 tmp_node = g.getEdgeTarget(edge);
             }
 
+            // Formation de l'edge node -> lemme
             Edge edgeLemme = new Edge(active_node+","+active_lemme,"LEMME");
             g.addEdge(active_node,active_lemme,edgeLemme);
 
+            // Formation de l'edge previousNode -> lemme
             FollowedBy edgeFollowed_LastNode_ActLemme = new FollowedBy(last_node+","+active_lemme);
             g.addEdge(last_node,active_lemme,edgeFollowed_LastNode_ActLemme);
 
+            // Formation de l'edge previousLemme -> lemme
+            //                  et previousNode  -> lemme
             if (last_lemme != null) {
                 FollowedBy edgeFollowed_LastLemme_ActLemme = new FollowedBy(last_lemme+","+active_lemme);
                 FollowedBy edgeFollowed_LastLemme_ActNode = new FollowedBy(last_lemme+","+active_node);
@@ -93,6 +101,7 @@ public class Graph {
 
             active_node = tmp_node;
         }
+        // Formation de l'edge lemme -> End
         FollowedBy edgeFollowed_LastLemme_ActNode = new FollowedBy(last_lemme+","+active_node);
         g.addEdge(last_lemme,active_node,edgeFollowed_LastLemme_ActNode);
         /*
@@ -229,11 +238,13 @@ public class Graph {
         AbstractNode nodeMultiWords = new Word(multiMots);
         g.addVertex(nodeMultiWords);
 
+        // Edges entre les noeuds précédent le début du multiMot
         for (AbstractEdge edge : getGraphFollowedBy().incomingEdgesOf(n1)){
             FollowedBy edgeFollowed_Pre_Multi = new FollowedBy(g.getEdgeSource(edge)+","+multiMots);
             g.addEdge(g.getEdgeSource(edge),nodeMultiWords,edgeFollowed_Pre_Multi);
         }
 
+        // Edges entre les noeuds suivants la fin de multiMot
         for (AbstractEdge edge : getGraphFollowedBy().outgoingEdgesOf(n2)){
             FollowedBy edgeFollowed_Post_Multi = new FollowedBy(multiMots+","+g.getEdgeTarget(edge));
             g.addEdge(nodeMultiWords,g.getEdgeTarget(edge),edgeFollowed_Post_Multi);
@@ -303,6 +314,9 @@ public class Graph {
         return allPaths;
     }
 
+    /**
+     * @return Liste des chemins du sous graph subGraph
+     */
     public List<GraphPath<AbstractNode, AbstractEdge>> getAllPaths(AsSubgraph<AbstractNode, AbstractEdge> subGraph){
         AllDirectedPaths<AbstractNode, AbstractEdge> graph = new AllDirectedPaths<AbstractNode, AbstractEdge>(subGraph);
 
@@ -312,6 +326,9 @@ public class Graph {
         return allPaths;
     }
 
+    /**
+     * @return Liste des chemins entre _start et _end du sous graph subGraph
+     */
     public List<List<AbstractNode>> getAllPathsBetween(AsSubgraph<AbstractNode, AbstractEdge> subGraph, AbstractNode _start, AbstractNode _end){
         AllDirectedPaths<AbstractNode, AbstractEdge> graph = new AllDirectedPaths<AbstractNode, AbstractEdge>(subGraph);
         List<GraphPath<AbstractNode, AbstractEdge>> allPaths =
